@@ -18,6 +18,7 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 		if (this.theme() == darkTheme)
 			this.theme(theme);
 		darkTheme = theme;
+		saveTheme();
 	};
 
 	this.lightTheme = function(theme) {
@@ -27,6 +28,7 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 		if (this.theme() == lightTheme)
 			this.theme(theme);
 		lightTheme = theme;
+		saveTheme();
 	};
 
 	this.getAce = function() {
@@ -42,13 +44,13 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 		originalEditor = editor;
 	
 	// Replace textarea for a div and hide the textarea
-	if (originalEditor != null && originalEditor.tagName.toLowerCase() == "textarea")
+	if (originalEditor != null && originalEditor.tagName.toLowerCase() == 'textarea')
 	{
 		// Create our replacement div
 		var div = document.createElement('div');
 		div.id = editor = 'zeneditor';
-		div.style.height = originalEditor.offsetHeight + "px";
-		div.style.width = originalEditor.offsetWidth + "px";
+		div.style.height = originalEditor.offsetHeight + 'px';
+		div.style.width = originalEditor.offsetWidth + 'px';
 		div.innerHTML = originalEditor.innerHTML;
 
 		// Hide the old one and insert it before the old one
@@ -69,14 +71,17 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 	var editor = ace.edit(editor);
 	var lightTheme = lightTheme == null ? 'chrome' : lightTheme;
 	var darkTheme = darkTheme == null ? 'monokai' : darkTheme;
-
-	editor.setTheme('ace/theme/' + lightTheme);
+	var cookieTheme = getCookie('zenedit_theme');
+	editor.setTheme('ace/theme/' + (cookieTheme == null ? lightTheme : (cookieTheme == 'dark' ? darkTheme : lightTheme)));
 	editor.getSession().setMode('ace/mode/' + (mode == null ? 'html' : mode));
 	editor.setDisplayIndentGuides(true);                         // Show lines showing indent level
 	editor.setShowPrintMargin(false);                            // Disable print margin (vertical line)
 	editor.setOption('scrollPastEnd', true);                     // You can scroll to the end of the file
 	editor.getSession().setUseSoftTabs(false);                   // Use real tab \t
 	editor.getSession().setTabSize(4);                           // Default tab size
+
+	// Update cookie expiration
+	saveTheme();
 
 	// Create simple system to move the editor around in DOM for fullscreen and normal screen
 	var placeholder = document.createElement('div');
@@ -87,8 +92,8 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 	var button = document.createElement('button');
 	button.setAttribute('type','button');
 	button.tabIndex = 200;
-	button.className = "zenedit_button fullscreen";
-	button.title = "Fullscreen";
+	button.className = 'zenedit_button fullscreen';
+	button.title = 'Fullscreen';
 	button.onclick = toggleFullscreen;
 	editor.container.appendChild(button);
 
@@ -96,8 +101,8 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 	var buttonTheme = document.createElement('button');
 	buttonTheme.setAttribute('type','button');
 	buttonTheme.tabIndex = 201;
-	buttonTheme.className = "zenedit_button theme";
-	buttonTheme.title = "Theme";
+	buttonTheme.className = 'zenedit_button theme';
+	buttonTheme.title = 'Theme';
 	buttonTheme.onclick = toggleTheme;
 	editor.container.appendChild(buttonTheme);
 
@@ -141,6 +146,25 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 	}
 
 	function toggleTheme() {
-		return (editor.getTheme() == 'ace/theme/' + darkTheme ? editor.setTheme('ace/theme/' + lightTheme) : editor.setTheme('ace/theme/' + darkTheme));
+		var result = (editor.getTheme() == 'ace/theme/' + darkTheme ? editor.setTheme('ace/theme/' + lightTheme) : editor.setTheme('ace/theme/' + darkTheme));
+		saveTheme();
+		return result;
+	}
+
+	function getCookie(name) {
+		var cookies = document.cookie.split(';');
+		for(var i = 0; i < cookies.length; i++) {
+			var cookie = cookies[i];
+			var keyvalue = cookie.split('=');
+			if (keyvalue[0] == name)
+				return keyvalue[1];
+		}
+		return null;
+	}
+
+	function saveTheme() {
+		var date = new Date();
+		date.setTime(date.getTime() + (7*24*60*60*1000));
+		document.cookie = 'zenedit_theme='+(editor.getTheme() == 'ace/theme/' + darkTheme ? 'dark' : 'light')+'; expires=' + date.toGMTString()+'; path=/';
 	}
 }
