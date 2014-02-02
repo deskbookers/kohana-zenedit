@@ -9,7 +9,7 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 
 	this.theme = function(theme) {
 		return (theme == null ? editor.getTheme().replace('ace/theme/', '') : editor.setTheme('ace/theme/' + theme));
-	}
+	};
 
 	this.darkTheme = function(theme) {
 		if (theme == null)
@@ -31,9 +31,41 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 
 	this.getAce = function() {
 		return editor;
+	};
+
+	// When ever we want to make a textarea into an editor we have to some funky stuff, so do that!
+	// Check if we have to insert a special div
+	var originalEditor = null;
+	if (typeof editor == 'string')
+		originalEditor = document.getElementById(editor);
+	if(typeof editor == 'object')
+		originalEditor = editor;
+	
+	// Replace textarea for a div and hide the textarea
+	if (originalEditor != null && originalEditor.tagName.toLowerCase() == "textarea")
+	{
+		// Create our replacement div
+		var div = document.createElement('div');
+		div.id = editor = 'zeneditor';
+		div.style.height = originalEditor.offsetHeight + "px";
+		div.style.width = originalEditor.offsetWidth + "px";
+		div.innerHTML = originalEditor.innerHTML;
+
+		// Hide the old one and insert it before the old one
+		originalEditor.style.display = 'none';
+		originalEditor.parentNode.insertBefore(div, originalEditor);
+
+		// Setup an event listener for when the form is getting submitted so we can update the original textarea
+		var form = closest(originalEditor, 'form');
+		if (form.addEventListener) {
+			form.addEventListener('submit', function(){originalEditor.innerHTML = editor.getValue();}, false);
+		} else if (form.attachEvent) {
+			form.attachEvent('onsubmit', function(){originalEditor.innerHTML = editor.getValue();});
+		}
 	}
 
-	// Default themes and settings
+	// Defaults and settings
+	var oldHtmlOverflow = document.body.parentNode.style.overflow;
 	var editor = ace.edit(editor);
 	var lightTheme = lightTheme == null ? 'chrome' : lightTheme;
 	var darkTheme = darkTheme == null ? 'monokai' : darkTheme;
@@ -41,11 +73,15 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 	editor.setTheme('ace/theme/' + lightTheme);
 	editor.getSession().setMode('ace/mode/' + (mode == null ? 'html' : mode));
 	editor.setDisplayIndentGuides(true);                         // Show lines showing indent level
-	editor.setShowPrintMargin(false);                            // Disable print margen (verticle line)
-	//editor.renderer.setVScrollBarAlwaysVisible(true);            // Always show verticle scrollbar
+	editor.setShowPrintMargin(false);                            // Disable print margin (vertical line)
 	editor.setOption('scrollPastEnd', true);                     // You can scroll to the end of the file
 	editor.getSession().setUseSoftTabs(false);                   // Use real tab \t
-	editor.getSession().setTabSize(4);                           // Defaul tab size
+	editor.getSession().setTabSize(4);                           // Default tab size
+
+	// Create simple system to move the editor around in DOM for fullscreen and normal screen
+	var placeholder = document.createElement('div');
+	placeholder.style.display = 'none';
+	editor.container.parentNode.insertBefore(placeholder, editor.container);
 
 	// Add buttons
 	var button = document.createElement('button');
@@ -71,18 +107,33 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 			closeFullscreen();
 	};
 
+	function closest(el, tagName) {
+		tagName = tagName.toLowerCase();
+		do {
+			el = el.parentNode;
+			if (el.tagName.toLowerCase() == tagName)
+				return el;
+		} while (el.parentNode);
+		return null;
+	}
+
 	function closeFullscreen() {
 		if ( ! editor.container.className.contains('zenedit_fullscreen'))
 			return;
+		placeholder.parentNode.insertBefore(editor.container, placeholder); // Move the editor to the body DOM
+		document.body.parentNode.style.overflow = oldHtmlOverflow; // Reset the main scrollbar
 		editor.unsetStyle('zenedit_fullscreen');
-		editor.resize(); // Triger resize based on new the new width/height etc
+		editor.renderer.onResize(true); // Trigger resize, so Ace can grab the new width/height settings etc
 	}
 
 	function openFullscreen() {
 		if (editor.container.className.contains('zenedit_fullscreen'))
 			return;
+		document.body.appendChild(editor.container); // Move the editor to the body DOM
+		document.body.parentNode.style.overflow = 'hidden'; // Hide the main scrollbar
 		editor.setStyle('zenedit_fullscreen');
-		editor.resize(); // Triger resize based on new the new width/height etc
+		editor.renderer.onResize(true); // Trigger resize, so Ace can grab the new width/height settings etc
+		editor.focus();
 	}
 
 	function toggleFullscreen() {

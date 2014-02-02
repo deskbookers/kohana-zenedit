@@ -1,9 +1,9 @@
 .zenedit_fullscreen {
 	border: none !important;
-	position: absolute !important;
+	position: fixed !important;
 	width: auto !important;
 	height: auto !important;
-	z-index: 1000;
+	z-index: 9000;
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -25,7 +25,7 @@ button.zenedit_button {
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
 	position: absolute;
-	z-index: 1001;
+	z-index: 9001;
 	right: 25px;
 	opacity: 0.5;
 }
