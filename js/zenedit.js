@@ -1,3 +1,5 @@
+/* Requires: //cdnjs.cloudflare.com/ajax/libs/ace/1.1.01/ace.js */
+
 function zenEdit(editor, mode, lightTheme, darkTheme)
 {
 	// Public methods
@@ -40,9 +42,10 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 	editor.getSession().setMode('ace/mode/' + (mode == null ? 'html' : mode));
 	editor.setDisplayIndentGuides(true);                         // Show lines showing indent level
 	editor.setShowPrintMargin(false);                            // Disable print margen (verticle line)
-	editor.renderer.setVScrollBarAlwaysVisible(true);            // Always show verticle scrollbar
+	//editor.renderer.setVScrollBarAlwaysVisible(true);            // Always show verticle scrollbar
 	editor.setOption('scrollPastEnd', true);                     // You can scroll to the end of the file
 	editor.getSession().setUseSoftTabs(false);                   // Use real tab \t
+	editor.getSession().setTabSize(4);                           // Defaul tab size
 
 	// Add buttons
 	var button = document.createElement('button');
@@ -72,14 +75,14 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 		if ( ! editor.container.className.contains('zenedit_fullscreen'))
 			return;
 		editor.unsetStyle('zenedit_fullscreen');
-		editor.renderer.onResize(true); // Triger resize based on new the new width/height etc
+		editor.resize(); // Triger resize based on new the new width/height etc
 	}
 
 	function openFullscreen() {
 		if (editor.container.className.contains('zenedit_fullscreen'))
 			return;
 		editor.setStyle('zenedit_fullscreen');
-		editor.renderer.onResize(true); // Triger resize based on new the new width/height etc
+		editor.resize(); // Triger resize based on new the new width/height etc
 	}
 
 	function toggleFullscreen() {
