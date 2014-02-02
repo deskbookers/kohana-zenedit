@@ -156,8 +156,8 @@ function zenEdit(editor, mode, lightTheme, darkTheme)
 		for(var i = 0; i < cookies.length; i++) {
 			var cookie = cookies[i];
 			var keyvalue = cookie.split('=');
-			if (keyvalue[0] == name)
-				return keyvalue[1];
+			if (keyvalue[0].trim() == name)
+				return keyvalue[1].trim();
 		}
 		return null;
 	}
