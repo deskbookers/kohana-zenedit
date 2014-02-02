@@ -1,0 +1,41 @@
+.zenedit_fullscreen {
+	border: none !important;
+	position: absolute !important;
+	width: auto !important;
+	height: auto !important;
+	z-index: 1000;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+button.zenedit_button:hover {
+	opacity: 1;
+}
+
+button.zenedit_button {
+	width: 24px;
+	height: 24px;
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #ddd;
+	background-color: #f7f7f7;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	position: absolute;
+	z-index: 1001;
+	right: 25px;
+	opacity: 0.5;
+}
+
+button.zenedit_button.fullscreen {
+	background-image: url(../images/zenedit_fullscreen.png);
+	top: 7px;
+}
+
+button.zenedit_button.theme {
+	background-image: url(../images/zenedit_theme.png);
+	top: 35px;
+}
