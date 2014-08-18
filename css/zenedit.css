@@ -1,4 +1,5 @@
-.zenedit_fullscreen {
+.zenedit_fullscreen
+{
 	border: none !important;
 	position: fixed !important;
 	width: auto !important;
@@ -10,11 +11,13 @@
 	left: 0;
 }
 
-button.zenedit_button:hover {
+button.zenedit_button:hover
+{
 	opacity: 1;
 }
 
-button.zenedit_button {
+button.zenedit_button
+{
 	width: 24px;
 	height: 24px;
 	padding: 4px;
@@ -30,12 +33,14 @@ button.zenedit_button {
 	opacity: 0.5;
 }
 
-button.zenedit_button.fullscreen {
-	background-image: url(../images/zenedit_fullscreen.png);
+button.zenedit_button.fullscreen
+{
+	background-image: url(images/zenedit_fullscreen.png);
 	top: 7px;
 }
 
-button.zenedit_button.theme {
-	background-image: url(../images/zenedit_theme.png);
+button.zenedit_button.theme
+{
+	background-image: url(images/zenedit_theme.png);
 	top: 35px;
 }
